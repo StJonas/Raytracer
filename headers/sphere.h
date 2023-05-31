@@ -125,4 +125,9 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
     return true;
 }
 
+std::ostream& operator<<(std::ostream& os, const sphere& sphereObj) {
+        os << "Sphere Object: (Center: " << sphereObj.center << ", Radius: " << sphereObj.radius << ")";
+        return os;
+    }
+
 #endif

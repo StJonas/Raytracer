@@ -5,7 +5,6 @@
 #include "headers/camera.h"
 #include "headers/light.h"
 #include "headers/parser.h"
-
 #include <iostream>
 
 color ray_color(const ray& r, const hittable& world) {
@@ -22,29 +21,31 @@ int main() {
 
     SceneData sceneData = parseXML();
 
-    // Access the camera, light, and sphere objects from the scene data
     camera& cameraObj = sceneData.cameraObj;
     light& lightObj = sceneData.lightObj;
-    sphere& sphereObj = sceneData.sphereObj;
+    std::vector<sphere>& sphereObjects = sceneData.sphereObjects;
 
-    // const auto aspect_ratio = 1.0;
-    // const int image_width = cameraObj.getResolutionHorizontal();
-    // const int image_height = cameraObj.getResolutionVertical();
-    const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 400;
-    const int image_height = static_cast<int>(image_width / aspect_ratio);
+    const int image_width = cameraObj.getResolutionHorizontal();
+    const int image_height = cameraObj.getResolutionVertical();
+    const auto aspect_ratio = image_width/image_height;
 
     // World
     hittable_list world;
-    world.add(make_shared<sphere>(point3(0,0,-1), 0.5));
-    world.add(make_shared<sphere>(point3(0,-100.5,-1), 100));
+    for (const sphere& sphereObj : sceneData.sphereObjects) {
+        // Access and use the current sphere object
+        std::cerr << "Sphere position: " << sphereObj.getPosition() << std::endl;
+        std::cerr <<"Sphere radius: " << sphereObj.getRadius() << std::endl;
+        world.add(make_shared<sphere>(sphereObj.getPosition(), sphereObj.getRadius()));
+    }
+    //world.add(make_shared<sphere>(point3(0,0,-1), 0.5));
+    // world.add(make_shared<sphere>(point3(0,0,-1), 0.5));
+    // world.add(make_shared<sphere>(point3(0,-100.5,-1), 100));
 
     // Camera
-
     auto viewport_height = 2.0;
     auto viewport_width = aspect_ratio * viewport_height;
     auto focal_length = 1.0;
-     
+      
     auto origin = point3(0, 0, 0);
     auto horizontal = vec3(viewport_width, 0, 0);
     auto vertical = vec3(0, viewport_height, 0);
@@ -53,7 +54,6 @@ int main() {
     // Render
 
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-
     for (int j = image_height-1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i) {

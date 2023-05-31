@@ -8,3 +8,4 @@ scenes/
 output.txt
 .vscode/settings.json
 .DS_Store
+image.ppm

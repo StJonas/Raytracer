@@ -8,7 +8,7 @@
 struct SceneData {
     camera cameraObj;
     light lightObj;
-    sphere sphereObj;
+    std::vector<sphere> sphereObjects;
 };
 
 SceneData parseXML()
@@ -16,7 +16,7 @@ SceneData parseXML()
     SceneData scene;
     // Load the XML document from a file
     pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file("../scenes/example2.xml");
+    pugi::xml_parse_result result = doc.load_file("./scenes/example1.xml");
 
     // Check if the XML document was loaded successfully
     if (!result)
@@ -76,15 +76,16 @@ SceneData parseXML()
         scene.cameraObj.setResolutionHorizontal(resolution_horizontal);
         scene.cameraObj.setResolutionVertical(resolution_vertical);
         scene.cameraObj.setMaxBounces(max_bounces);
-        // Print out the camera attributes
-        std::cout << "Camera Attributes:" << std::endl;
-        std::cout << "Position: " << positionx << ", " << positiony << ", " << positionz << std::endl;
-        std::cout << "Lookat: " << lookatx << ", " << lookaty << ", " << lookatz << std::endl;
-        std::cout << "Up: " << upx << ", " << upy << ", " << upz << std::endl;
-        std::cout << "Horizontal FOV: " << horizontal_fov << std::endl;
-        std::cout << "Resolution (Horizontal): " << resolution_horizontal << std::endl;
-        std::cout << "Resolution (Vertical): " << resolution_vertical << std::endl;
-        std::cout << "Max Bounces: " << max_bounces << std::endl;
+
+        // Print
+        // std::cout << "Camera Attributes:" << std::endl;
+        // std::cout << "Position: " << positionx << ", " << positiony << ", " << positionz << std::endl;
+        // std::cout << "Lookat: " << lookatx << ", " << lookaty << ", " << lookatz << std::endl;
+        // std::cout << "Up: " << upx << ", " << upy << ", " << upz << std::endl;
+        // std::cout << "Horizontal FOV: " << horizontal_fov << std::endl;
+        // std::cout << "Resolution (Horizontal): " << resolution_horizontal << std::endl;
+        // std::cout << "Resolution (Vertical): " << resolution_vertical << std::endl;
+        // std::cout << "Max Bounces: " << max_bounces << std::endl;
     }
 
     pugi::xml_node lightsNode = root.child("lights");
@@ -106,11 +107,10 @@ SceneData parseXML()
             vec3 direction(0.0, 0.0, 0.0);
             scene.lightObj.setDirection(direction);
 
-            // Create an AmbientLightData object and fill it with the retrieved data
-            std::cout << "ambient_light:" << std::endl;
-            std::cout << "ambientLight color: " << std::endl;
-            std::cout << "Color: " << ambientLightR << ", " << ambientLightG << ", " << ambientLightB << std::endl;
-            // Use the ambientLightData object as needed in your parser logic or store it in a collection
+            //print
+            // std::cout << "ambient_light:" << std::endl;
+            // std::cout << "ambientLight color: " << std::endl;
+            // std::cout << "Color: " << ambientLightR << ", " << ambientLightG << ", " << ambientLightB << std::endl;
         }
         else if (lightType == "parallel_light")
         {
@@ -130,13 +130,11 @@ SceneData parseXML()
             vec3 direction(parallelLightDirectionX, parallelLightDirectionY, parallelLightDirectionZ);
             scene.lightObj.setDirection(direction);
 
-            // Create a ParallelLightData object and fill it with the retrieved data
-            std::cout << "parallel_light:" << std::endl;
-            std::cout << "ambientLight color: " << std::endl;
-            std::cout << "Color: " << parallelLightR << ", " << parallelLightG << ", " << parallelLightB << std::endl;
-            std::cout << "direction: " << parallelLightDirectionX << ", " << parallelLightDirectionY << ", " << parallelLightDirectionZ << std::endl;
-
-            // Use the parallelLightData object as needed in your parser logic or store it in a collection
+            //print
+            // std::cout << "parallel_light:" << std::endl;
+            // std::cout << "ambientLight color: " << std::endl;
+            // std::cout << "Color: " << parallelLightR << ", " << parallelLightG << ", " << parallelLightB << std::endl;
+            // std::cout << "direction: " << parallelLightDirectionX << ", " << parallelLightDirectionY << ", " << parallelLightDirectionZ << std::endl;
         }
     }
 
@@ -145,7 +143,7 @@ SceneData parseXML()
     for (pugi::xml_node sphereNode : surfacesNode.children("sphere"))
     {
         counter++;
-        std::cout << "Object nr: " << counter << std::endl;
+        //std::cout << "Object nr: " << counter << std::endl;
 
         //SPHERE
         double sphereRadius = sphereNode.attribute("radius").as_double();
@@ -155,8 +153,9 @@ SceneData parseXML()
         double spherePositionZ = positionNode.attribute("z").as_double();
         vec3 position(spherePositionX, spherePositionY, spherePositionZ);
 
-        scene.sphereObj.setPosition(position);
-        scene.sphereObj.setRadius(sphereRadius);
+        sphere sphereObject;
+        sphereObject.setPosition(position);
+        sphereObject.setRadius(sphereRadius);
 
         // MATERIAL
         pugi::xml_node materialSolidNode = sphereNode.child("material_solid");
@@ -174,25 +173,26 @@ SceneData parseXML()
         double refractionIOF = materialSolidNode.child("refraction").attribute("iof").as_double();
         vec3 materialColor(sphereColorR, sphereColorG, sphereColorB);
         vec3 phong(phongKA, phongKD,phongKS);
-        scene.sphereObj.setMaterialColor(materialColor);
-        scene.sphereObj.setPhong(phong);
-        scene.sphereObj.setPhongExponent(phongExponent);
-        scene.sphereObj.setReflectance(reflectanceR);
-        scene.sphereObj.setTransmittance(transmittanceT);
-        scene.sphereObj.setRefraction(refractionIOF);
+        sphereObject.setMaterialColor(materialColor);
+        sphereObject.setPhong(phong);
+        sphereObject.setPhongExponent(phongExponent);
+        sphereObject.setReflectance(reflectanceR);
+        sphereObject.setTransmittance(transmittanceT);
+        sphereObject.setRefraction(refractionIOF);
+        scene.sphereObjects.push_back(sphereObject);
 
         // Create a SphereData object and fill it with the retrieved data
-        std::cout << "surfaces:" << std::endl;
-        std::cout << "sphereRadius: " << sphereRadius << std::endl;
-        std::cout << "position: " << spherePositionX << ", " << spherePositionY << ", " << spherePositionZ << std::endl;
-        std::cout << "material_solid:" << std::endl;
-        std::cout << "color: " << std::endl;
-        std::cout << sphereColorR << ", " << sphereColorG << ", " << sphereColorB << std::endl;
-        std::cout << "phong: " << std::endl;
-        std::cout << phongKA << ", " << phongKD << ", " << phongKS << phongExponent << std::endl;
-        std::cout << "reflectanceR: " << reflectanceR << std::endl;
-        std::cout << "transmittanceT: " << transmittanceT << std::endl;
-        std::cout << "refractionIOF: " << refractionIOF << std::endl;
+        // std::cout << "surfaces:" << std::endl;
+        // std::cout << "sphereRadius: " << sphereRadius << std::endl;
+        // std::cout << "position: " << spherePositionX << ", " << spherePositionY << ", " << spherePositionZ << std::endl;
+        // std::cout << "material_solid:" << std::endl;
+        // std::cout << "color: " << std::endl;
+        // std::cout << sphereColorR << ", " << sphereColorG << ", " << sphereColorB << std::endl;
+        // std::cout << "phong: " << std::endl;
+        // std::cout << phongKA << ", " << phongKD << ", " << phongKS << phongExponent << std::endl;
+        // std::cout << "reflectanceR: " << reflectanceR << std::endl;
+        // std::cout << "transmittanceT: " << transmittanceT << std::endl;
+        // std::cout << "refractionIOF: " << refractionIOF << std::endl;
     }
     // Close the output file
     outputFile.close();
