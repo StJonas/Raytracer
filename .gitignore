@@ -8,4 +8,5 @@ scenes/
 output.txt
 .vscode/settings.json
 .DS_Store
-image.ppm
+.ppm
+parser.cc
