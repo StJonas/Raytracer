@@ -7,15 +7,16 @@
 #include "headers/parser.h"
 #include <iostream>
 
-color ray_color(const ray& r, const hittable& world, const light& lightObj) {
+color ray_color(const ray& r, const hittable& world, const light& lightObj, int maxBounces) {
     hit_record rec;
+    if (maxBounces <= 0)
+        return lightObj.getBackgroundColor();
+
     if (world.hit(r, 0, infinity, rec)) {
-        return 0.5 * (rec.normal + lightObj.getBackgroundColor());
+        return rec.color;
     }
-    vec3 unit_direction = unit_vector(r.direction());
-    auto t = 0.5*(unit_direction.y() + 1.0);
-    //return (1.0-t)*color(1.0, 1.0, 1.0) + t*color(0.5, 0.7, 1.0);
-    return (1.0-t)*lightObj.getBackgroundColor() + t*lightObj.getColor();
+
+    return lightObj.getBackgroundColor();
 }
 
 int main() {
@@ -30,25 +31,22 @@ int main() {
     const auto aspect_ratio = image_width/image_height;
 
     // World
-    int i = 0;
     hittable_list world;
     for (const sphere& sphereObj : sceneData.sphereObjects) {
-        world.add(make_shared<sphere>(sphereObj.getPosition(), sphereObj.getRadius()));
+        world.add(make_shared<sphere>(sphereObj.getRadius(), sphereObj.getPosition(), sphereObj.getMaterialColor()));
+        //std::cout << "Color: " << sphereObj.getMaterialColor();
     }
 
     // Camera
     auto viewport_height = 2.0;
-    //auto viewport_height = 2.0 * std::tan(cameraObj.getHorizontalFOV() / 2.0);
-    viewport_height /= cameraObj.getResolutionVertical();
     auto viewport_width = aspect_ratio * viewport_height;
-    //auto viewport_width = cameraObj.getHorizontalFOV();
-    auto focal_length = 1.0;
-      
-    //auto origin = point3(0, 0, 0);
-    auto origin = cameraObj.getLookAt();
+    auto focal_length = 2.0;
+
+    auto origin = cameraObj.getPosition();
     auto horizontal = vec3(viewport_width, 0, 0);
     auto vertical = vec3(0, viewport_height, 0);
     auto lower_left_corner = origin - horizontal/2 - vertical/2 - vec3(0, 0, focal_length);
+    auto maxBounces = cameraObj.getMaxBounces();
 
     // Render
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
@@ -59,9 +57,18 @@ int main() {
             auto u = double(i) / (image_width-1);
             auto v = double(j) / (image_height-1);
             ray r(origin, lower_left_corner + u*horizontal + v*vertical);
+            //ray r(origin, lower_left_corner + horizontal + vertical);
 
-            color pixel_color = ray_color(r, world, lightObj);
+            color pixel_color = ray_color(r, world, lightObj, maxBounces);
             write_color(std::cout, pixel_color);
+
+            // if (i < cameraObj.getMaxBounces()) {
+            //     color pixel_color = ray_color(r, world, lightObj);
+            //     write_color(std::cout, pixel_color);
+            // } else {
+            //    color pixel_color = lightObj.getBackgroundColor(); // Assign a default color
+            //    write_color(std::cout, pixel_color);
+            // }
         }
     }
 

@@ -9,6 +9,7 @@ class sphere : public hittable {
         sphere() {};
         sphere(point3 cen, double r) : center(cen), radius(r) {};
         sphere(double radius, const vec3& position) : center(position), radius(radius) {};
+        sphere(double radius, const vec3& position, const vec3& color) : center(position), radius(radius), color(color) {};
 
         virtual bool hit(
             const ray& r, double t_min, double t_max, hit_record& rec) const override;
@@ -44,7 +45,7 @@ class sphere : public hittable {
 };
 
 void sphere::setPosition(const vec3& position) {
-    center = position;
+    this->center = position;
 }
 vec3 sphere::getPosition() const {
     return center;
@@ -58,7 +59,7 @@ vec3 sphere::getMaterialColor() const {
 }
 
 void sphere::setRadius(double& radius) {
-    radius = radius;
+    this->radius = radius;
 }
 double sphere::getRadius() const {
     return radius;
@@ -121,6 +122,8 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
     rec.p = r.at(rec.t);
     vec3 outward_normal = (rec.p - center) / radius;
     rec.normal = (rec.p - center) / radius;
+    rec.color = this->getMaterialColor(); 
+    //std::cout << "Color: " << this->getMaterialColor();
 
     return true;
 }

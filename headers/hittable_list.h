@@ -2,6 +2,8 @@
 #define HITTABLE_LIST_H
 
 #include "hittable.h"
+#include "color.h"
+#include "sphere.h"
 
 #include <memory>
 #include <vector>
