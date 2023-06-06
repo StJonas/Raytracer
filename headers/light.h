@@ -33,26 +33,6 @@ public:
     vec3 color;
     vec3 direction;
     bool isAmbient;
-
-    //         vec3 nTransformedNormal = normalize(transformedNormal);
-    //         vec3 lightColor = vec3(1.0, 1.0, 1.0);
-    //         vec3 lightVector = normalize(vLightPosition.xyz - vViewPosition.xyz); 
-    //         float lightIntensity = max(dot(lightVector, nTransformedNormal), 0.0);
-
-    //         float diffuseIntensity = 0.5;
-    //         vec4 diffuseColor = vec4(vVertexColor.rgb * lightIntensity, 1.0);
-    //         vec4 ambientColor = vec4(ambientLightColor, 1.0) * ambientReflection;
-    //         vec4 diffuse = diffuseColor * diffuseIntensity;
-
-    //         vec3 viewDirection = normalize(-vViewPosition.xyz);
-    //         vec3 halfwayDirection = normalize(lightVector + viewDirection);
-    //         float specularIntensity = pow(max(dot(nTransformedNormal, halfwayDirection), 0.0), shininess);
-    //         vec3 spec = specularColor.rgb * specularReflection;
-    //         vec4 final_specular = vec4(spec, 1.0) * specularIntensity;
-
-    //         vec4 finalColor = diffuseColor + final_specular; (+ambient)
-    //         final_specular.a = 1.0;
-    //         gl_FragColor = finalColor;
 };
 
 vec3 light::getBackgroundColor() const {
@@ -102,23 +82,6 @@ vec3 light::calcFinalColor(light ambient, light parallel, hit_record rec){
     finalColor = finalAmbient*rec.phong.x() + finalDiffuse * rec.phong.y() + specularComponent*rec.phong.z() ;
    
     return finalColor;
-}
-
-// let v = -ray.dir.unit_vector();
-//         let reflect = 2. * &light_direction.dot(normal)
-//             * normal
-//             - &light_direction;
-//         let spec = reflect
-//             .unit_vector()
-//             .dot(&v)
-//             .max(0.)
-//             .powf(phong.exponent);
-//         let specular = &self.color * spec;
-
-vec3 light::calcShading(){
-    // ich muss quasi vom intersection point einen ray zur light source erstellen, und wenn dann da was dazwischen ist, 
-    // dann wird die fläche geshaded
-    return vec3(0,0,0);
 }
 
 #endif
