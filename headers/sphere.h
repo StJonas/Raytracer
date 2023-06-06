@@ -9,7 +9,8 @@ class sphere : public hittable {
         sphere() {};
         sphere(point3 cen, double r) : center(cen), radius(r) {};
         sphere(double radius, const vec3& position) : center(position), radius(radius) {};
-        sphere(double radius, const vec3& position, const vec3& color) : center(position), radius(radius), color(color) {};
+        sphere(double radius, const vec3& position, const vec3& color, const vec3& phong, const double phongE) : 
+        center(position), radius(radius), color(color), phong(phong), phongExponent(phongE) {};
 
         virtual bool hit(
             const ray& r, double t_min, double t_max, hit_record& rec) const override;
@@ -28,6 +29,7 @@ class sphere : public hittable {
         vec3 getPosition() const;
         vec3 getMaterialColor() const;
         vec3 getPhong() const;
+        double getPhongKA() const;
         double getPhongExponent() const;
         double getReflectance() const;
         double getTransmittance() const;
@@ -71,6 +73,10 @@ void sphere::setPhong(const vec3& phong) {
 vec3 sphere::getPhong() const {
     return phong;
 }
+double sphere::getPhongKA() const {
+    return phong.x();
+}
+
 
 void sphere::setPhongExponent(const double& phongExponent) {
     this->phongExponent = phongExponent;
@@ -122,8 +128,11 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
     rec.p = r.at(rec.t);
     vec3 outward_normal = (rec.p - center) / radius;
     rec.normal = (rec.p - center) / radius;
+    rec.phong=this->getPhong();
+    rec.phongE=this->getPhongExponent();
+    rec.r = r;
+
     rec.color = this->getMaterialColor(); 
-    //std::cout << "Color: " << this->getMaterialColor();
 
     return true;
 }

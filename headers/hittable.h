@@ -9,6 +9,16 @@ struct hit_record {
     double t;
     bool front_face;
     vec3 color;
+    vec3 phong;
+    int phongE;
+    ray r;
+
+    inline void setPhong(vec3 phong){
+        this->phong = phong;
+    }
+    inline void setPhongE(double phongE){
+        this->phongE = phongE;
+    }
 
     inline void set_face_normal(const ray& r, const vec3& outward_normal) {
         front_face = dot(r.direction(), outward_normal) < 0;

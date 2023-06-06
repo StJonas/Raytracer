@@ -1,12 +1,13 @@
-notes.txt
+*.txt
 main
 parser
 readme.md
 a.out
-image.ppm
+*.ppm
 scenes/
 output.txt
-.vscode/settings.json
+.vscode/
 .DS_Store
 .ppm
 parser.cc
+art/

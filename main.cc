@@ -7,33 +7,48 @@
 #include "headers/parser.h"
 #include <iostream>
 
-color ray_color(const ray& r, const hittable& world, const light& lightObj, int maxBounces) {
+color ray_color(const ray& r, const hittable& world, light& ambientLight, light& parallelLight, int maxBounces) {
     hit_record rec;
     if (maxBounces <= 0)
-        return lightObj.getBackgroundColor();
+        return ambientLight.getBackgroundColor();
 
-    if (world.hit(r, 0, infinity, rec)) {
+    if (world.hit(r, 0.001, infinity, rec)) {
+        //todo: shadow intersection - cast_shadowray (rec, parallelLight)
+
+        rec.color = ambientLight.calcFinalColor(ambientLight, parallelLight, rec);
+        ray_color(r, world, ambientLight, parallelLight, maxBounces-1);
+
         return rec.color;
     }
 
-    return lightObj.getBackgroundColor();
+    return ambientLight.getBackgroundColor();
 }
 
 int main() {
     SceneData sceneData = parseXML();
 
     camera& cameraObj = sceneData.cameraObj;
-    light& lightObj = sceneData.lightObj;
+    std::vector<light>& lightObjects = sceneData.lightObjects;
+    light ambientLight(vec3(0,0,0), vec3(0,0,0));
+    light parallelLight(vec3(0,0,0), vec3(0,0,0));
     std::vector<sphere>& sphereObjects = sceneData.sphereObjects;
 
     const int image_width = cameraObj.getResolutionHorizontal();
     const int image_height = cameraObj.getResolutionVertical();
     const auto aspect_ratio = image_width/image_height;
 
+    for (const light& lightObj : sceneData.lightObjects) {
+        if (lightObj.getIsAmbient()) {
+            ambientLight = lightObj;
+        } else {
+            parallelLight = lightObj;
+    }
+    }
+
     // World
     hittable_list world;
     for (const sphere& sphereObj : sceneData.sphereObjects) {
-        world.add(make_shared<sphere>(sphereObj.getRadius(), sphereObj.getPosition(), sphereObj.getMaterialColor()));
+        world.add(make_shared<sphere>(sphereObj.getRadius(), sphereObj.getPosition(), sphereObj.getMaterialColor(), sphereObj.getPhong(), sphereObj.getPhongExponent()));
         //std::cout << "Color: " << sphereObj.getMaterialColor();
     }
 
@@ -57,20 +72,19 @@ int main() {
             auto u = double(i) / (image_width-1);
             auto v = double(j) / (image_height-1);
             ray r(origin, lower_left_corner + u*horizontal + v*vertical);
-            //ray r(origin, lower_left_corner + horizontal + vertical);
 
-            color pixel_color = ray_color(r, world, lightObj, maxBounces);
+            color pixel_color = ray_color(r, world, ambientLight, parallelLight, maxBounces);
+            if (pixel_color.x() > 1) {
+                pixel_color = vec3(0.999, pixel_color.y(), pixel_color.z());
+            } 
+            if(pixel_color.y() > 1){
+                pixel_color = vec3(pixel_color.x(), 0.999, pixel_color.z());
+            }
+            if(pixel_color.z() > 1){
+                pixel_color = vec3(pixel_color.x(), pixel_color.y(), 0.999);
+            }
             write_color(std::cout, pixel_color);
-
-            // if (i < cameraObj.getMaxBounces()) {
-            //     color pixel_color = ray_color(r, world, lightObj);
-            //     write_color(std::cout, pixel_color);
-            // } else {
-            //    color pixel_color = lightObj.getBackgroundColor(); // Assign a default color
-            //    write_color(std::cout, pixel_color);
-            // }
         }
     }
-
     std::cerr << "\nDone.\n";
 }
