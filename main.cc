@@ -9,16 +9,19 @@
 
 color ray_color(const ray& r, const hittable& world, light& ambientLight, light& parallelLight, int maxBounces) {
     hit_record rec;
+    hit_record recShader;
     if (maxBounces <= 0)
         return ambientLight.getBackgroundColor();
 
     if (world.hit(r, 0.001, infinity, rec)) {
-        //todo: shadow intersection - cast_shadowray (rec, parallelLight)
-
-        rec.color = ambientLight.calcFinalColor(ambientLight, parallelLight, rec);
-        ray_color(r, world, ambientLight, parallelLight, maxBounces-1);
-
-        return rec.color;
+        recShader.color = ambientLight.calcShading(parallelLight, rec, world);
+        if(recShader.color == vec3(0.0,0.0,0.0)){
+            rec.color = ambientLight.calcFinalColor(ambientLight, parallelLight, rec);
+            ray_color(r, world, ambientLight, parallelLight, maxBounces-1);
+            return rec.color;
+        }
+        
+        return recShader.color;
     }
 
     return ambientLight.getBackgroundColor();

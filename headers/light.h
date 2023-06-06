@@ -2,6 +2,7 @@
 #define LIGHT_H
 
 #include "vec3.h"
+#include "hittable.h"
 #include <algorithm>
 #include <cmath>
 
@@ -27,7 +28,7 @@ public:
     void setIsAmbient(const bool isAmbient);
 
     vec3 calcFinalColor(light ambient, light parallel, hit_record rec);
-    vec3 calcShading();
+    vec3 calcShading(light parallel, hit_record rec, const hittable& world);
 
     vec3 backgroundColor;
     vec3 color;
@@ -81,6 +82,21 @@ vec3 light::calcFinalColor(light ambient, light parallel, hit_record rec){
     vec3 finalColor;
     finalColor = finalAmbient*rec.phong.x() + finalDiffuse * rec.phong.y() + specularComponent*rec.phong.z() ;
    
+    return finalColor;
+}
+
+vec3 light::calcShading(light parallel, hit_record rec, const hittable& world){
+    vec3 shadowRayDirection = -unit_vector(parallel.getDirection());
+    ray shadowRay(rec.p, shadowRayDirection);
+    vec3 finalColor(0.0,0.0,0.0);
+    hit_record recNew;
+
+    if (dot(rec.normal, shadowRayDirection) >= 0.0) {
+        if (world.hit(shadowRay, 0.001, infinity, recNew)) {
+        return this->getColor()*rec.color*rec.phong.x();
+        }
+    }
+
     return finalColor;
 }
 

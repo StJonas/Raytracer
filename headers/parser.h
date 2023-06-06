@@ -16,7 +16,7 @@ SceneData parseXML()
     SceneData scene;
     // Load the XML document from a file
     pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file("./scenes/example2.xml");
+    pugi::xml_parse_result result = doc.load_file("./scenes/example3.xml");
 
     // Check if the XML document was loaded successfully
     if (!result)
