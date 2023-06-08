@@ -14,27 +14,15 @@ struct SceneData {
 SceneData parseXML(const std::string& xmlFilePath)
 {
     SceneData scene;
-    // Load the XML document from a file
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(xmlFilePath.c_str());
-    //pugi::xml_parse_result result = doc.load_file("./scenes/example3.xml");
 
-    // Check if the XML document was loaded successfully
     if (!result)
     {
         std::cout << "XML parsing error: " << result.description() << std::endl;
         //return;
     }
 
-    // // Open the output file
-     std::ofstream outputFile("output.txt");
-    if (!outputFile.is_open())
-    {
-        std::cout << "Failed to open output file." << std::endl;
-        //return;
-    }
-
-    // Access elements and attributes in the XML document
     pugi::xml_node root = doc.child("scene");
 
     light lightObject;
@@ -222,9 +210,6 @@ SceneData parseXML(const std::string& xmlFilePath)
         // std::cout << "transmittanceT: " << transmittanceT << std::endl;
         // std::cout << "refractionIOF: " << refractionIOF << std::endl;
     }
-
-
-    outputFile.close();
 
     return scene;
 }

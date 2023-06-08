@@ -30,11 +30,9 @@ color ray_color(const ray& r, const object& world, light& ambientLight, light& p
 
 int main(int argc, char* argv[]) {
     std::string xmlFilePath = argv[1];
-    //std::string outputFilePath = "image.ppm";
     std::filesystem::path inputFile(xmlFilePath);
     std::string outputFilePath = inputFile.stem().string() + ".ppm";
     SceneData sceneData = parseXML(xmlFilePath);
-    //SceneData sceneData = parseXML();
 
     cam& cameraObj = sceneData.cameraObj;
     std::vector<light>& lightObjects = sceneData.lightObjects;
@@ -64,7 +62,7 @@ int main(int argc, char* argv[]) {
         //std::cout << "Color: " << sphereObj.getMaterialColor();
     }
 
-    // cam
+    // Camera
     auto viewport_height = 2.0;
     auto viewport_width = aspect_ratio * viewport_height;
     auto focal_length = 2.0;
@@ -76,7 +74,7 @@ int main(int argc, char* argv[]) {
     auto maxBounces = cameraObj.getMaxBounces();
 
     // Render
-    std::ofstream outputFile(outputFilePath);  // Open the output file
+    std::ofstream outputFile(outputFilePath); 
     outputFile << "P3\n" << image_width << ' ' << image_height << "\n255\n";
     for (int j = image_height - 1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
@@ -99,7 +97,7 @@ int main(int argc, char* argv[]) {
             write_color(outputFile, pixel_color);
         }
     }
-    outputFile.close();  // Close the output file
+    outputFile.close(); 
     std::cerr << "\nDone.\n";
 
 }

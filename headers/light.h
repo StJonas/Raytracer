@@ -89,7 +89,7 @@ vector light::calcFinalColor(light ambient, light pLight, intersection_record re
     if(pLight.getType()==light::PARALLEL){
         //reflectVector = v - 2 * dot(v, n) * n 
         reflectionVector = -unit_vector(pLight.getDirection()) - 2 * dot(-unit_vector(pLight.getDirection()), rec.normal) * rec.normal;
-    } else{
+    } else if(pLight.getType()==light::POINT){
         vector lightPosition = pLight.getPosition();
         vector lightDirection = -unit_vector(lightPosition - rec.p);
         reflectionVector = lightDirection - 2 * dot(lightDirection, rec.normal) * rec.normal;

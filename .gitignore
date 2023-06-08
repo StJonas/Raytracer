@@ -1,13 +1,8 @@
 *.txt
 main
-parser
-readme.md
 a.out
 *.ppm
 scenes/
-output.txt
 .vscode/
 .DS_Store
-.ppm
-parser.cc
 art/
