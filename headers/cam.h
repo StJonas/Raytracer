@@ -1,13 +1,13 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef CAM_H
+#define CAM_H
 
-#include "vec3.h"
+#include "vector.h"
 
-class camera {
+class cam {
 public:
     // Constructors
-    camera(){};
-    camera(const vec3& position, const vec3& lookAt, const vec3& up, double horizontalFOV,
+    cam(){};
+    cam(const vector& position, const vector& lookAt, const vector& up, double horizontalFOV,
                int resolutionHorizontal, int resolutionVertical, int maxBounces)
     : position(position),
       lookAt(lookAt),
@@ -18,27 +18,27 @@ public:
       maxBounces(maxBounces) {}
 
     // Getter methods
-    vec3 getPosition() const;
-    vec3 getLookAt() const;
-    vec3 getUp() const;
+    vector getPosition() const;
+    vector getLookAt() const;
+    vector getUp() const;
     double getHorizontalFOV() const;
     int getResolutionHorizontal() const;
     int getResolutionVertical() const;
     int getMaxBounces() const;
 
     // Setter methods
-    void setPosition(const vec3& position);
-    void setLookAt(const vec3& lookAt);
-    void setUp(const vec3& up);
+    void setPosition(const vector& position);
+    void setLookAt(const vector& lookAt);
+    void setUp(const vector& up);
     void setHorizontalFOV(double horizontalFOV);
     void setResolutionHorizontal(int resolutionHorizontal);
     void setResolutionVertical(int resolutionVertical);
     void setMaxBounces(int maxBounces);
 
 private:
-    vec3 position;
-    vec3 lookAt;
-    vec3 up;
+    vector position;
+    vector lookAt;
+    vector up;
     double horizontalFOV;
     int resolutionHorizontal;
     int resolutionVertical;
@@ -47,60 +47,60 @@ private:
 
 
 // Getter methods
-vec3 camera::getPosition() const {
+vector cam::getPosition() const {
     return position;
 }
 
-vec3 camera::getLookAt() const {
+vector cam::getLookAt() const {
     return lookAt;
 }
 
-vec3 camera::getUp() const {
+vector cam::getUp() const {
     return up;
 }
 
-double camera::getHorizontalFOV() const {
+double cam::getHorizontalFOV() const {
     return horizontalFOV;
 }
 
-int camera::getResolutionHorizontal() const {
+int cam::getResolutionHorizontal() const {
     return resolutionHorizontal;
 }
 
-int camera::getResolutionVertical() const {
+int cam::getResolutionVertical() const {
     return resolutionVertical;
 }
 
-int camera::getMaxBounces() const {
+int cam::getMaxBounces() const {
     return maxBounces;
 }
 
 // Setter methods
-void camera::setPosition(const vec3& position) {
+void cam::setPosition(const vector& position) {
     this->position = position;
 }
 
-void camera::setLookAt(const vec3& lookAt) {
+void cam::setLookAt(const vector& lookAt) {
     this->lookAt = lookAt;
 }
 
-void camera::setUp(const vec3& up) {
+void cam::setUp(const vector& up) {
     this->up = up;
 }
 
-void camera::setHorizontalFOV(double horizontalFOV) {
+void cam::setHorizontalFOV(double horizontalFOV) {
     this->horizontalFOV = horizontalFOV;
 }
 
-void camera::setResolutionHorizontal(int resolutionHorizontal) {
+void cam::setResolutionHorizontal(int resolutionHorizontal) {
     this->resolutionHorizontal = resolutionHorizontal;
 }
 
-void camera::setResolutionVertical(int resolutionVertical) {
+void cam::setResolutionVertical(int resolutionVertical) {
     this->resolutionVertical = resolutionVertical;
 }
 
-void camera::setMaxBounces(int maxBounces) {
+void cam::setMaxBounces(int maxBounces) {
     this->maxBounces = maxBounces;
 }
 

@@ -1,34 +1,34 @@
-#ifndef SPHERE_H
-#define SPHERE_H
+#ifndef SPHEREOBJECT_H
+#define SPHEREOBJECT_H
 
-#include "vec3.h"
-#include "hittable.h"
+#include "vector.h"
+#include "object.h"
 
-class sphere : public hittable {
+class sphere_object : public object {
     public:
-        sphere() {};
-        sphere(point3 cen, double r) : center(cen), radius(r) {};
-        sphere(double radius, const vec3& position) : center(position), radius(radius) {};
-        sphere(double radius, const vec3& position, const vec3& color, const vec3& phong, const double phongE) : 
+        sphere_object() {};
+        sphere_object(point3 cen, double r) : center(cen), radius(r) {};
+        sphere_object(double radius, const vector& position) : center(position), radius(radius) {};
+        sphere_object(double radius, const vector& position, const vector& color, const vector& phong, const double phongE) : 
         center(position), radius(radius), color(color), phong(phong), phongExponent(phongE) {};
 
         virtual bool hit(
-            const ray& r, double t_min, double t_max, hit_record& rec) const override;
+            const ray& r, double t_min, double t_max, intersection_record& rec) const override;
 
     public:
         point3 center;
         double radius;
-        vec3 color;
-        vec3 phong;
+        vector color;
+        vector phong;
         double phongExponent;
         double reflectance;
         double transmittance;
         double refraction;
 
         double getRadius() const;
-        vec3 getPosition() const;
-        vec3 getMaterialColor() const;
-        vec3 getPhong() const;
+        vector getPosition() const;
+        vector getMaterialColor() const;
+        vector getPhong() const;
         double getPhongKA() const;
         double getPhongExponent() const;
         double getReflectance() const;
@@ -37,77 +37,77 @@ class sphere : public hittable {
 
         // Setter methods
         void setRadius(double& radius);
-        void setPosition(const vec3& position);
-        void setMaterialColor(const vec3& color);
-        void setPhong(const vec3& phong);
+        void setPosition(const vector& position);
+        void setMaterialColor(const vector& color);
+        void setPhong(const vector& phong);
         void setPhongExponent(const double& exponent);
         void setReflectance(const double& reflectance);
         void setTransmittance(const double& transmittance);
         void setRefraction(const double& refraction);
 };
 
-void sphere::setPosition(const vec3& position) {
+void sphere_object::setPosition(const vector& position) {
     this->center = position;
 }
-vec3 sphere::getPosition() const {
+vector sphere_object::getPosition() const {
     return center;
 }
 
-void sphere::setMaterialColor(const vec3& color) {
+void sphere_object::setMaterialColor(const vector& color) {
     this->color = color;
 }
-vec3 sphere::getMaterialColor() const {
+vector sphere_object::getMaterialColor() const {
     return color;
 }
 
-void sphere::setRadius(double& radius) {
+void sphere_object::setRadius(double& radius) {
     this->radius = radius;
 }
-double sphere::getRadius() const {
+double sphere_object::getRadius() const {
     return radius;
 }
 
-void sphere::setPhong(const vec3& phong) {
+void sphere_object::setPhong(const vector& phong) {
     this->phong = phong;
 }
-vec3 sphere::getPhong() const {
+vector sphere_object::getPhong() const {
     return phong;
 }
-double sphere::getPhongKA() const {
+double sphere_object::getPhongKA() const {
     return phong.x();
 }
 
 
-void sphere::setPhongExponent(const double& phongExponent) {
+void sphere_object::setPhongExponent(const double& phongExponent) {
     this->phongExponent = phongExponent;
 }
-double sphere::getPhongExponent() const {
+double sphere_object::getPhongExponent() const {
     return phongExponent;
 }
 
-void sphere::setReflectance(const double& reflectance) {
+void sphere_object::setReflectance(const double& reflectance) {
     this->reflectance = reflectance;
 }
-double sphere::getReflectance() const {
+double sphere_object::getReflectance() const {
     return reflectance;
 }
 
-void sphere::setTransmittance(const double& transmittance) {
+void sphere_object::setTransmittance(const double& transmittance) {
     this->transmittance = transmittance;
 }
-double sphere::getTransmittance() const {
+double sphere_object::getTransmittance() const {
     return transmittance;
 }
 
-void sphere::setRefraction(const double& refraction) {
+void sphere_object::setRefraction(const double& refraction) {
     this->refraction = refraction;
 }
-double sphere::getRefraction() const {
+double sphere_object::getRefraction() const {
     return refraction;
 }
 
-bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
-    vec3 oc = r.origin() - center;
+bool sphere_object::hit(const ray& r, double t_min, double t_max, intersection_record& rec) const {
+    vector oc = r.origin() - center;
     auto a = r.direction().length_squared();
     auto half_b = dot(oc, r.direction());
     auto c = oc.length_squared() - radius*radius;
@@ -126,7 +126,7 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 
     rec.t = root;
     rec.p = r.at(rec.t);
-    vec3 outward_normal = (rec.p - center) / radius;
+    vector outward_normal = (rec.p - center) / radius;
     rec.normal = (rec.p - center) / radius;
     rec.phong=this->getPhong();
     rec.phongE=this->getPhongExponent();
@@ -137,8 +137,8 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
     return true;
 }
 
-std::ostream& operator<<(std::ostream& os, const sphere& sphereObj) {
-        os << "Sphere Object: (Center: " << sphereObj.center << ", Radius: " << sphereObj.radius << ")";
+std::ostream& operator<<(std::ostream& os, const sphere_object& sphereObj) {
+        os << "sphere_object Object: (Center: " << sphereObj.center << ", Radius: " << sphereObj.radius << ")";
         return os;
     }
 
