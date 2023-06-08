@@ -11,12 +11,13 @@ struct SceneData {
     std::vector<sphere> sphereObjects;
 };
 
-SceneData parseXML()
+SceneData parseXML(const std::string& xmlFilePath)
 {
     SceneData scene;
     // Load the XML document from a file
     pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file("./scenes/example3.xml");
+    pugi::xml_parse_result result = doc.load_file(xmlFilePath.c_str());
+    //pugi::xml_parse_result result = doc.load_file("./scenes/example3.xml");
 
     // Check if the XML document was loaded successfully
     if (!result)
@@ -107,7 +108,7 @@ SceneData parseXML()
             lightObject.setColor(color);
             vec3 direction(0.0, 0.0, 0.0);
             lightObject.setDirection(direction);
-            lightObject.setIsAmbient(true);
+            lightObject.setType(light::AMBIENT);
 
             //print
             // std::cout << "ambient_light:" << std::endl;
@@ -131,7 +132,31 @@ SceneData parseXML()
             double parallelLightDirectionZ = directionNode.attribute("z").as_double();
             vec3 direction(parallelLightDirectionX, parallelLightDirectionY, parallelLightDirectionZ);
             lightObject.setDirection(direction);
-            lightObject.setIsAmbient(false);
+            lightObject.setType(light::PARALLEL);
+            //print
+            // std::cout << "parallel_light:" << std::endl;
+            // std::cout << "ambientLight color: " << std::endl;
+            // std::cout << "Color: " << parallelLightR << ", " << parallelLightG << ", " << parallelLightB << std::endl;
+            // std::cout << "direction: " << parallelLightDirectionX << ", " << parallelLightDirectionY << ", " << parallelLightDirectionZ << std::endl;
+        }
+        else if (lightType == "point_light")
+        {
+            // Retrieve the color attributes of the parallel_light node
+            pugi::xml_node colorNode = lightNode.child("color");
+            double parallelLightR = colorNode.attribute("r").as_double();
+            double parallelLightG = colorNode.attribute("g").as_double();
+            double parallelLightB = colorNode.attribute("b").as_double();
+            vec3 color(parallelLightR, parallelLightG, parallelLightB);
+            lightObject.setColor(color);
+
+            // Retrieve the direction attributes of the parallel_light node
+            pugi::xml_node positionNode = lightNode.child("position");
+            double parallelLightDirectionX = positionNode.attribute("x").as_double();
+            double parallelLightDirectionY = positionNode.attribute("y").as_double();
+            double parallelLightDirectionZ = positionNode.attribute("z").as_double();
+            vec3 position(parallelLightDirectionX, parallelLightDirectionY, parallelLightDirectionZ);
+            lightObject.setPosition(position);
+            lightObject.setType(light::PARALLEL);
             //print
             // std::cout << "parallel_light:" << std::endl;
             // std::cout << "ambientLight color: " << std::endl;
@@ -197,7 +222,8 @@ SceneData parseXML()
         // std::cout << "transmittanceT: " << transmittanceT << std::endl;
         // std::cout << "refractionIOF: " << refractionIOF << std::endl;
     }
-    // Close the output file
+
+
     outputFile.close();
 
     return scene;

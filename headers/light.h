@@ -8,6 +8,12 @@
 
 class light {
 public:
+    enum LightType {
+        AMBIENT,
+        PARALLEL,
+        POINT
+    };
+
     // Constructors
     light() {};
     light(const vec3& color, const vec3& direction)
@@ -19,13 +25,14 @@ public:
     vec3 getBackgroundColor() const;
     vec3 getColor() const;
     vec3 getDirection() const;
-    bool getIsAmbient() const;
+    vec3 getPosition() const;
 
     // Setter methods
     void setBackgroundColor(const vec3& backgroundColor);
     void setColor(const vec3& color);
     void setDirection(const vec3& direction);
-    void setIsAmbient(const bool isAmbient);
+    void setPosition(const vec3& position);
+    void setType(LightType light);
 
     vec3 calcFinalColor(light ambient, light parallel, hit_record rec);
     vec3 calcShading(light parallel, hit_record rec, const hittable& world);
@@ -33,7 +40,12 @@ public:
     vec3 backgroundColor;
     vec3 color;
     vec3 direction;
-    bool isAmbient;
+    vec3 position;
+    LightType lightType;
+
+    LightType getType() const {
+    return this->lightType;
+    }  
 };
 
 vec3 light::getBackgroundColor() const {
@@ -60,33 +72,47 @@ void light::setDirection(const vec3& newDirection) {
     this->direction = newDirection;
 }
 
-bool light::getIsAmbient() const {
-    return isAmbient;
-}
-void light::setIsAmbient(const bool isAmbient) {
-    this->isAmbient = isAmbient;
+void light::setType(const LightType lightType) {
+    this->lightType = lightType;
 }
 
-vec3 light::calcFinalColor(light ambient, light parallel, hit_record rec){
-    //reflectVector = v - 2 * dot(v, n) * n 
-    vec3 reflectionVector = -unit_vector(parallel.getDirection()) - 2 * dot(-unit_vector(parallel.getDirection()), rec.normal) * rec.normal;
+vec3 light::getPosition() const {
+    return position;
+}
+void light::setPosition(const vec3& newPosition) {
+    this->position = newPosition;
+}
+
+vec3 light::calcFinalColor(light ambient, light pLight, hit_record rec){
+    vec3 finalColor;
+    vec3 reflectionVector;
+    if(pLight.getType()==light::PARALLEL){
+        //reflectVector = v - 2 * dot(v, n) * n 
+        reflectionVector = -unit_vector(pLight.getDirection()) - 2 * dot(-unit_vector(pLight.getDirection()), rec.normal) * rec.normal;
+    } else{
+        vec3 lightPosition = pLight.getPosition();
+        vec3 lightDirection = -unit_vector(lightPosition - rec.p);
+        reflectionVector = lightDirection - 2 * dot(lightDirection, rec.normal) * rec.normal;
+    }
+
     //specular = reflectVector * viewDirection -> viewDirection = -ray direction
     double spec = pow(std::max(0.0, dot(-unit_vector(reflectionVector), -unit_vector(rec.r.direction()))), rec.phongE);
-    vec3 specularComponent = parallel.getColor() * spec;
+    vec3 specularComponent = pLight.getColor() * spec;
+    
     //diffuse = lightColor * max(0, dot(surfaceNormal, lightDirection))
-    vec3 diffuseComponent =  rec.color * std::max(0.0, dot(rec.normal, -unit_vector(parallel.getDirection())));
-    vec3 finalDiffuse = diffuseComponent * parallel.getColor();
+    vec3 diffuseComponent =  rec.color * std::max(0.0, dot(rec.normal, -unit_vector(pLight.getDirection())));
+    vec3 finalDiffuse = diffuseComponent * pLight.getColor();
 
     vec3 finalAmbient = ambient.getColor()*rec.color;
-
-    vec3 finalColor;
+    
     finalColor = finalAmbient*rec.phong.x() + finalDiffuse * rec.phong.y() + specularComponent*rec.phong.z() ;
-   
+
+    //std::cerr << "light pos: " << rec.p;
     return finalColor;
 }
 
-vec3 light::calcShading(light parallel, hit_record rec, const hittable& world){
-    vec3 shadowRayDirection = -unit_vector(parallel.getDirection());
+vec3 light::calcShading(light pLight, hit_record rec, const hittable& world){
+    vec3 shadowRayDirection = -unit_vector(pLight.getDirection());
     ray shadowRay(rec.p, shadowRayDirection);
     vec3 finalColor(0.0,0.0,0.0);
     hit_record recNew;
